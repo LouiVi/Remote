@@ -3,7 +3,7 @@ cfg.Light, cfg.MUI, cfg.Portrait;
 
 app.LoadPlugin( "Support" );
 app.LoadPlugin( "Utils" );
-
+var found = false;
 var animations = app.CreateSupport().AnimationManager().keys;
 var animLength = animations.length;
 
@@ -47,20 +47,41 @@ DisplayAllRows();
 CreateButton(lay, "Sleep", "Sleep");
 CreateButton(lay, "Home", "Home");
 CreateButton(lay, "Power", "Power");*/
+
+CreateButton(lay, "", "");
+CreateButton(lay, "Up", "Up");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+//CreateButton(lay, "🟠 Down ", "VolumeDown");
+CreateButton(lay, "Left", "Left");
+CreateButton(lay, "Ok", "Select");
+CreateButton(lay, "Right", "Right");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+CreateButton(lay, "Down", "Down");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "🟠 Up   ", "VolumeUp");
 CreateButton(lay, "", "");
-CreateButton(lay, "Up", "Up");
+CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "🟠 Down ", "VolumeDown");
-CreateButton(lay, "Left", "Left");
-CreateButton(lay, "Ok", "Select");
-CreateButton(lay, "Right", "Right");
+//CreateButton(lay, "🟠 Mute ", "VolumeMute");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+//CreateButton(lay, "🟠 Down ", "VolumeDown");
 CreateButton(lay, "🟠 Mute ", "VolumeMute");
 CreateButton(lay, "", "");
-CreateButton(lay, "Down", "Down");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+CreateButton(lay, "", "");
+
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "Repeat", "InstantReplay");
@@ -76,6 +97,7 @@ CreateButton(lay, "Fwd", "Fwd");
     // Add the layout to the app
 
     app.AddLayout(lay);
+    CheckIP();
 
 }
 
@@ -117,6 +139,14 @@ function CreateButton(lay, text, command) {
     	btn.SetBackGradient(  MUI.colors.gray.darken2, MUI.colors.gray.lighten2, MUI.colors.gray.darken1);
  btn.SetStyle(MUI.colors.gray.lighten3, MUI.colors.gray.lighten1, 5, MUI.colors.gray.darken4, 1,1);
        }
+       if(text=="Up" || text == "Down" || text == "Left" || text == "Right" || text == "Ok"){
+       	btn.SetTextColor( "#ffffff" );
+    	btn.SetTextShadow( 7, 0, 0, MUI.colors.deepPurple.darken4);
+    	
+    	btn.SetBackGradient(  MUI.colors.deepPurple.darken2, MUI.colors.deepPurple.lighten2, MUI.colors.deepPurple.darken1);
+ btn.SetStyle(MUI.colors.deepPurple.lighten3, MUI.colors.deepPurple.lighten1, 5, MUI.colors.deepPurple.darken4, 1,1);
+  
+       }
     //self = this;
     btn.data["command"]=command;
 		//self.command = command;
@@ -145,7 +175,7 @@ function StartListening() {
 
 function OnSpeechResult(result) {
 
-    HandleCommand(result);//.toLowerCase());
+    HandleCommand(result[0].toLowerCase());
 
 }
 
@@ -155,62 +185,79 @@ function OnSpeechResult(result) {
 
 function HandleCommand(command) {
 
-    if (command.includes("Play")) {
+    if (command.includes("play")) {
 
         SendCommand("Play");
 
-    } else if (command.includes("Pause")) {
+    } else if (command.includes("back")) {
 
-        SendCommand("Pause");
+        SendCommand("Back");
 
-    } else if (command.includes("Stop")) {
+    } else if (command.includes("sleep")) {
 
-        SendCommand("Stop");
+        SendCommand("Sleep");
 
-    } else if (command.includes("Up")) {
+    } else if (command == "up") {
 
         SendCommand("Up");
 
-    } else if (command.includes("Down")) {
+    } else if (command == "down") {
 
         SendCommand("Down");
 
-    } else if (command.includes("Left")) {
+    } else if (command == "left") {
 
         SendCommand("Left");
 
-    } else if (command.includes("Right")) {
+    } else if (command == "right") {
 
         SendCommand("Right");
 
-    } else if (command.includes("Ok")) {
+    } else if (command.includes("ok")) {
 
         SendCommand("Select");
 
-    } else if (command.includes("Menu")) {
+    } else if (command.includes("menu")) {
 
-        SendCommand("Home");
+        SendCommand("Info");
 
-    } else if (command.includes("Volume Up")) {
+    } else if (command.includes("volume up")) {
 
         SendCommand("VolumeUp");
 
-    } else if (command.includes("Volume Down")) {
+    } else if (command.includes("volume down")) {
 
         SendCommand("VolumeDown");
 
-    } else if (command.includes("Volume Mute")) {
+    } else if (command.includes("volume mute")) {
 
         SendCommand("VolumeMute");
 
-    } else if (command.includes("Power")) {
+    } else if (command.includes("power")) {
 
         SendCommand("Power");
+         } else if (command.includes("home")) {
 
-    } else if (command.includes("Netflix")) {
+        SendCommand("Home");
+/*660807
+837
+12
+13*/
+    } else if (command.includes("netflix")) {
 
-        SendCommand("Launch/YOUR_NETFLIX_APP_ID"); // Replace YOUR_NETFLIX_APP_ID with actual ID
+        ChangeToApp("12");
+} else if (command.includes("prime")) {
 
+        ChangeToApp("13");
+} else if (command.includes("youtube")) {
+
+        ChangeToApp("837");
+} else if (command.includes("camera")) {
+
+        ChangeToApp("660807");
+
+    
+    
     } else {
 
         app.ShowPopup("Command not recognized");
@@ -231,6 +278,19 @@ function SendCommand(command) {
     xhr.onload = function() {
         if (xhr.status == 200)
             app.ShowPopup("The [" +command +"] command was executed successfully.");
+        else
+            app.ShowPopup("Failed to execute command. " + command);
+    };
+}
+
+function ChangeToApp(appID) {
+    var baseUrl = "http://[ROKU_IP]:8060/Launch/".replace("[ROKU_IP]", app.ReadFile( "ip.txt" ) );
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", baseUrl + command, true);
+    xhr.send();
+    xhr.onload = function() {
+        if (xhr.status == 200)
+            app.ShowPopup("The [" +appID+"] command was executed successfully.");
         else
             app.ShowPopup("Failed to execute command. " + command);
     };
@@ -283,8 +343,8 @@ txtMenu.SetTextShadow( 7, 2, 2, "#000000" );
     
         
     //Create search icon.
-    txtSearch = app.CreateText( "[fa-power-off]", -1,-1, "FontAwesome" );
-    txtSearch.SetPadding( 2,2,0,10, "dip" );
+    txtSearch = app.CreateText( "  [fa-power-off]", -1,-1, "FontAwesome, Right" );
+    txtSearch.SetPadding( 0,2,0,10, "dip" );
     txtSearch.SetTextSize( 26  );
     txtSearch.SetTextColor( "#ffffff");
 txtSearch.SetTextShadow( 7, 2, 2, "#000000" );
@@ -342,6 +402,67 @@ else if(mi[self.index]=="Menu" ) SendCommand("Info")
 	//alert(JSON.stringify(event.source));
 	}
 
+async function CheckIP()
+{
+	if(app.FileExists("roku-remote.txt")){
+		contents = app.ReadFile( "roku-remote.txt" ).split(",");
+	//	txt.SetText(  contents[0] );
+ //   txt2.SetText(  contents[1] );
+    	if(utils.Confirm("We already have saved a Roku Device called: "+contents[1]+" with IP: "+contents[0]+". You want to search for a new one?")) app.DeleteFile( "roku-remote.txt" ), CheckIP();
+  }else{
+	await GetRokuTVIP();
+	}
+
+}
+
+async function GetRokuTVIP() {
+    ip = app.GetRouterAddress();
+    parts = ip.split(".");
+    size = parts.length;
+    fromNum = parseInt(parts[size - 1]);
+    toNum = 164;
+
+    for (c = toNum; c > fromNum; c--) {
+        if (found) {
+            break;
+        }
+				rIp = rokuIP =  `${parts[0]}.${parts[1]}.${parts[2]}.${c}`;
+        url = `http://${parts[0]}.${parts[1]}.${parts[2]}.${c}:8060/query/device-info`;
+
+        try {
+            app.ShowPopup(`Checking URL: \r\n${url}`, "Long, Top");
+            await sendHttpRequest(url);
+        } catch (error) {
+            app.ShowPopup(`Error at ${url}: \r${error}`);
+        }
+    }
+}
+
+async function sendHttpRequest(url) {
+    return new Promise((resolve, reject) => {
+        app.HttpRequest("GET", url, null, null, (error, reply, status) => {
+            if (status === 200) {
+                found = true;
+                deviceName = reply.slice( reply.indexOf("<friendly-device-name>") + 22, reply.indexOf("</friendly-device-name>") );
+                deviceMac = reply.slice( reply.indexOf("<wifi-mac>") + 10, reply.indexOf("</wifi-mac>") );
+                deviceNetwork = reply.slice( reply.indexOf("<network-name>") + 14, reply.indexOf("</network-name>") );
+             
+             
+                   //deviceName = reply.slice( reply.indexOf("<default-device-name>") + 21, reply.indexOf("</default-device-name>") );
+             
+                //txt.SetText(  rokuIP );
+                //txt2.SetText(  deviceName );
+  //             txtTab4.SetText( deviceMac );
+                app.WriteFile( "device-info.txt", reply );
+                app.WriteFile( "roku-remote.txt", rokuIP+"," +deviceName + ","+deviceMac + ","+deviceNetwork);
+               // resolve(reply);
+                 resolve(deviceName);
+            } else {
+                reject(error || "Request failed");
+            }
+        });
+    });
+}
 
  
 
