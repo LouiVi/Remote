@@ -2,24 +2,37 @@
 cfg.Light, cfg.MUI, cfg.Portrait;
 
 app.LoadPlugin( "Support" );
+app.LoadPlugin( "Utils" );
+
+var animations = app.CreateSupport().AnimationManager().keys;
+var animLength = animations.length;
 
 function OnStart() {
-
-    app.SetOrientation("Portrait");
-
+app.ExtractAssets( app.GetAppPath()+"ip.txt", "ip.txt", true );
     app.SetTitle("Roku Remote");
 
  
 
     // Create a layout with vertical orientation
 
-    var lay = app.CreateLayout("linear", "Vertical, VCenter");
+     lay = app.CreateLayout("linear", "Vertical, VCenter");
 
  sup = app.CreateSupport();
  
+ var animations = app.CreateSupport().AnimationManager().keys;
+var animLength = animations.length;
+utils = app.CreateUtils("LuilloSoft Inc.");
+	
+	rColor = utils.RandomHexColor(false);
+	app.SetStatusBarColor(  rColor)
+	app.SetNavBarColor( rColor )
+CreateActionBar();
+CreateMenuBar(rColor)
  grid = sup.CreateGridLayout();
  grid.SetColCount( 4 );
  lay.AddChild( grid );
+ 
+ 
 
     db = app.OpenDatabase( "/storage/emulated/0/Download/Remote.sqlite" );
     //alert(db.GetName());
@@ -30,10 +43,10 @@ function OnStart() {
 DisplayAllRows();
 
     // Create buttons for each command
-CreateButton(lay, "Back", "Back");
+/*CreateButton(lay, "Back", "Back");
 CreateButton(lay, "Sleep", "Sleep");
 CreateButton(lay, "Home", "Home");
-CreateButton(lay, "Power", "Power");
+CreateButton(lay, "Power", "Power");*/
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
@@ -58,25 +71,7 @@ CreateButton(lay, "Fwd", "Fwd");
 //db.ExecuteSql( "INSERT INTO test_table (data, data_num)" +   
   //      " VALUES (?,?)", ["test", 100], null, OnError )  
 
-   // db.Close();
-var layHoriz = app.CreateLayout("linear", "Horizontall, FillX");
-
-lay.AddChild( layHoriz );
-    // Create a button to start speech recognition
-
-    var btnSpeech = app.CreateButton("Voice", 0.5, 0.1,"AutoShrink");
-
-    btnSpeech.SetOnTouch(StartListening);
-
-    layHoriz.AddChild(btnSpeech);
-
-   
-   
-var btnInfo = app.CreateButton("Menu", 0.5, 0.1,"AutoShrink");
-
-    btnInfo.SetOnTouch(()=>{SendCommand("Info");});
-
-    layHoriz.AddChild(btnInfo);
+ 
 
     // Add the layout to the app
 
@@ -138,10 +133,8 @@ if(btn.data["command"]=="") eval("btn.Gone();");
 
 function StartListening() {
 
-    var speech = app.CreateSpeechRec();
-
+    speech = app.CreateSpeechRec();
     speech.SetOnResult(OnSpeechResult);
-
     speech.Recognize();
 
 }
@@ -152,7 +145,7 @@ function StartListening() {
 
 function OnSpeechResult(result) {
 
-    HandleCommand(result.toLowerCase());
+    HandleCommand(result);//.toLowerCase());
 
 }
 
@@ -231,7 +224,7 @@ function HandleCommand(command) {
 // Function to send a command via HTTP to Roku
 
 function SendCommand(command) {
-    var baseUrl = "http://192.168.70.163:8060/keypress/";
+    var baseUrl = "http://[ROKU_IP]:8060/keypress/".replace("[ROKU_IP]", app.ReadFile( "ip.txt" ) );
     var xhr = new XMLHttpRequest();
     xhr.open("POST", baseUrl + command, true);
     xhr.send();
@@ -243,7 +236,111 @@ function SendCommand(command) {
     };
 }
 
- 
+function GetRandomAnim()
+{
+	gra = animations[utils.RandomIntegerRange(0, animLength)];
+//	app.ShowPopup( "Animation: "+gra + tvar);
+	if(gra.includes("out") || gra.includes("Out") || gra.includes("Slide")) {
+		return GetRandomAnim();
+	} else {
+		return gra;
+	}
+}
+
+//Create an action bar at the top.
+function CreateActionBar()
+{
+    //Create horizontal layout for top bar.
+    layHoriz = app.CreateLayout( "Linear", "Bottom,Horizontal,FillX,Left" );
+    layHoriz.SetBackGradient( utils.GetGradientColors(utils.GetGradientColors(rColor)[1])[0], utils.GetGradientColors(rColor)[1], utils.GetGradientColors(utils.GetGradientColors(rColor)[1])[1]);
+    //color.PINK_LIGHT_4, color.PINK_DARK_2, color.PINK_ACCENT_2);
+    lay.AddChild( layHoriz );
+    layHoriz.SetSize( 1, 0.07 )
+    
+    //Create menu (hamburger) icon .
+    txtMenu = app.CreateText( "[fa-home]", -1,-1, "FontAwesome" );
+    txtMenu.SetPadding( 12,2,12,10, "dip" );
+    txtMenu.SetTextSize( 26 );
+    txtMenu.SetTextColor( "white" );
+txtMenu.SetTextShadow( 7, 2, 2, "#000000" );
+    txtMenu.SetOnTouchUp( function(){SendCommand("Home");} );
+    layHoriz.AddChild( txtMenu );
+    
+    //Create layout for title box.
+    layBarTitle = app.CreateLayout( "Linear", "Horizontal" );
+    layBarTitle.SetSize( 0.73);//, 0.08791 );
+    layHoriz.AddChild( layBarTitle );
+    
+    //Create title.
+    txtBarTitle = app.CreateText( app.GetAppName().split("_").join(" "), -1,-1, "Left" );
+    txtBarTitle.SetFontFile( "Misc/LuckiestGuy-Regular.ttf");//Misc/YoungSerif-Regular.ttf" );
+    txtBarTitle.SetMargins(5,0,0,10,"dip");
+    txtBarTitle.SetTextSize( 22 );
+    txtBarTitle.SetTextColor( "#ffffff");
+    
+ txtBarTitle.SetTextShadow( 7, 2, 2, "#000000" );
+    layBarTitle.AddChild( txtBarTitle );
+    
+        
+    //Create search icon.
+    txtSearch = app.CreateText( "[fa-power-off]", -1,-1, "FontAwesome" );
+    txtSearch.SetPadding( 2,2,0,10, "dip" );
+    txtSearch.SetTextSize( 26  );
+    txtSearch.SetTextColor( "#ffffff");
+txtSearch.SetTextShadow( 7, 2, 2, "#000000" );
+    txtSearch.SetOnTouchUp( function(){SendCommand("Power");} );
+    layHoriz.AddChild( txtSearch );
+    
+}
+
+function CreateMenuBar(col)
+{
+    layHoriz2 = app.CreateLayout( "Linear", "Horizontal,FillX,Left" );
+    layHoriz2.SetBackGradient( utils.GetGradientColors(col)[0], col, utils.GetGradientColors(col)[1]);
+    lay.AddChild( layHoriz2 );
+	layHoriz2.SetSize( 1.0, 0.0991 );
+
+mh = new Array();
+mv = new Array();
+mi = new Array();
+mt = new Array();
+mi = ["Back","Sleep","Voice","Menu"];
+mi2 = ["arrow_back","more_time","speaker_notes","menu_book"];
+for(c=0;c<4;c++){
+mh[c] = app.CreateLayout( "Linear", "Vertical" );
+mh[c].SetSize(0.25, 0.85);
+if(c==0) mh[c].SetBackColor("#00" + col.replace("#",""));
+layHoriz2.AddChild( mh[c] );
+for(d=0;d<2;d++){
+mv[d] = app.CreateLayout( "Linear", "Vertical,VCenter" );
+//if(d==0) { mv[d].SetSize(1.0, 0.25);}else{mv[d].SetSize(1.0, 1.75);}
+//if(d==0) mv[d].SetBackColor("#ef000000");
+if(d==0) mt[c] = app.CreateText( mi2[c] ), mt[c].SetMargins(0.01,0.01,0.01,0.01), mt[c].index = c, mt[c].SetOnTouch(mt_OnTouch),mt[c].SetFontFile("Misc/MaterialIcons-Regular.ttf"), mv[d].AddChild(mt[c]), mt[c].SetTextSize(24), mt[c].SetTextColor("#ffffff"), mt[c].SetTextShadow(5,2,2,"#000000");
+if(d==1) mt[c] = app.CreateText( mi[c] ), mv[d].AddChild(mt[c]), mt[c].index = c, mt[c].SetOnTouch(mt_OnTouch),mt[c].SetTextColor("#ffffff"),  mt[c].SetTextShadow(5,0,0,"#000000"),mt[c].SetTextSize(12);
+mh[c].AddChild(mv[d]);
+}
+}
+}
+
+function mt_OnTouch(event)
+{
+self = this;
+//alert(self.GetText());
+if(event.action == "Down") {
+for(rt=0;rt<4;rt++){
+mh[rt].SetBackColor("#00000000");
+}
+app.Vibrate( "0,100,30,100,50,300" );
+mh[self.index].Animate(GetRandomAnim(),null, 350);
+mh[self.index].SetBackColor("#a969ea69");
+if(mi[self.index]=="Back" ) SendCommand("Back")
+else if(mi[self.index]=="Sleep" ) SendCommand("Sleep")
+else if(mi[self.index]=="Voice" ) StartListening()
+else if(mi[self.index]=="Menu" ) SendCommand("Info")
+
+}
+	//alert(JSON.stringify(event.source));
+	}
 
 
  
