@@ -31,7 +31,9 @@ CreateMenuBar(rColor)
  grid = sup.CreateGridLayout();
  grid.SetColCount( 4 );
  lay.AddChild( grid );
- 
+ web = app.CreateWebView( 1,-1 )
+ web.LoadHtml( app.ReadFile("marquee.html") );
+ lay.AddChild( web )
  
 
     db = app.OpenDatabase( "/storage/emulated/0/Download/Remote.sqlite" );
@@ -129,7 +131,7 @@ function CreateButton(lay, text, command) {
     db.ExecuteSql( "INSERT INTO remoteButtons (caption, command)" +   
       " VALUES (?,?)", [text, command], null, ()=>{app.ShowPopup( "Error" );});
       
-    btn = app.CreateButton(text, 0.25, 0.070,"AutoShrink");
+    btn = app.CreateButton(text, 0.25, 0.090,"AutoShrink");
     btn.SetFontFile( "Misc/ArchitectsDaughter-Regular.ttf" );
     btn.SetTextSize( 12 );
     if(text=="🟠 Up   " || text == "🟠 Down " || text == "🟠 Mute "){
