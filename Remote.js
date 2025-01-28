@@ -1,6 +1,6 @@
 // Initialize the app and start listening
 cfg.Light, cfg.MUI, cfg.Portrait;
-
+app.DisableKeys( 'VOLUME_DOWN,VOLUME_UP' );
 app.LoadPlugin( "Support" );
 app.LoadPlugin( "Utils" );
 var found = false;
@@ -8,6 +8,7 @@ var animations = app.CreateSupport().AnimationManager().keys;
 var animLength = animations.length;
 
 function OnStart() {
+app.SetOnKey( OnKey );
 app.ExtractAssets( app.GetAppPath()+"ip.txt", "ip.txt", true );
     app.SetTitle("Roku Remote");
 
@@ -51,35 +52,36 @@ CreateButton(lay, "Home", "Home");
 CreateButton(lay, "Power", "Power");*/
 
 CreateButton(lay, "", "");
-CreateButton(lay, "Up", "Up");
+CreateButton(lay, "↑ Up", "Up");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 //CreateButton(lay, "🟠 Down ", "VolumeDown");
-CreateButton(lay, "Left", "Left");
+CreateButton(lay, "← Left", "Left");
 CreateButton(lay, "Ok", "Select");
-CreateButton(lay, "Right", "Right");
+CreateButton(lay, "Right →", "Right");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
-CreateButton(lay, "Down", "Down");
+CreateButton(lay, "↓ Down", "Down");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "🟠 Up   ", "VolumeUp");
-CreateButton(lay, "", "");
-CreateButton(lay, "", "");
+CreateButton(lay, "Netflix", "12");
+CreateButton(lay, "YouTube", "837");
 CreateButton(lay, "", "");
 CreateButton(lay, "🟠 Down ", "VolumeDown");
 //CreateButton(lay, "🟠 Mute ", "VolumeMute");
-CreateButton(lay, "", "");
-CreateButton(lay, "", "");
+CreateButton(lay, "Prime", "13");
+CreateButton(lay, "Max", "61322");
 CreateButton(lay, "", "");
 //CreateButton(lay, "🟠 Down ", "VolumeDown");
 CreateButton(lay, "🟠 Mute ", "VolumeMute");
+CreateButton(lay, "Camera", "660807");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
-CreateButton(lay, "", "");
+
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
@@ -100,7 +102,18 @@ CreateButton(lay, "Fwd", "Fwd");
 
     app.AddLayout(lay);
     CheckIP();
+    ChangeToApp("837");
 
+}
+
+async function OnKey(action, name, code, extra) {
+    if(action == "Up"){
+    	if(name == "VOLUME_UP"){
+    		SendCommand("VolumeUp");
+    	}else{
+    		SendCommand("VolumeDown");
+    	}
+    }
 }
 
  function DisplayAllRows() 
@@ -121,7 +134,7 @@ function OnResult( results )
         var item = results.rows.item(i)  
         s += item.id + ", " + item.layout + ", " + item.caption + ", " + item.command + "\n";   
     }  
-    alert(s);
+    //alert(s);
     //txt.SetText( s )  
 }  
 
@@ -130,8 +143,13 @@ function OnResult( results )
 function CreateButton(lay, text, command) {
     db.ExecuteSql( "INSERT INTO remoteButtons (caption, command)" +   
       " VALUES (?,?)", [text, command], null, ()=>{app.ShowPopup( "Error" );});
-      
-    btn = app.CreateButton(text, 0.25, 0.090,"AutoShrink");
+     // if(text=="↑ Up" || text == "↓ Down" || text == "← Left" || text == "Right →" || text == "Ok"){
+     if(text=="🟠 Up   " || text == "🟠 Down " || text == "🟠 Mute "){
+  
+      btn = app.CreateButton(text, 0.25, 0.070,"AutoShrink");
+ }else{
+    btn = app.CreateButton(text, 0.25, 0.075,"AutoShrink");
+    }
     btn.SetFontFile( "Misc/ArchitectsDaughter-Regular.ttf" );
     btn.SetTextSize( 12 );
     if(text=="🟠 Up   " || text == "🟠 Down " || text == "🟠 Mute "){
@@ -141,7 +159,7 @@ function CreateButton(lay, text, command) {
     	btn.SetBackGradient(  MUI.colors.gray.darken2, MUI.colors.gray.lighten2, MUI.colors.gray.darken1);
  btn.SetStyle(MUI.colors.gray.lighten3, MUI.colors.gray.lighten1, 5, MUI.colors.gray.darken4, 1,1);
        }
-       if(text=="Up" || text == "Down" || text == "Left" || text == "Right" || text == "Ok"){
+       if(text=="↑ Up" || text == "↓ Down" || text == "← Left" || text == "Right →" || text == "Ok"){
        	btn.SetTextColor( "#ffffff" );
     	btn.SetTextShadow( 7, 0, 0, MUI.colors.deepPurple.darken4);
     	
@@ -149,10 +167,50 @@ function CreateButton(lay, text, command) {
  btn.SetStyle(MUI.colors.deepPurple.lighten3, MUI.colors.deepPurple.lighten1, 5, MUI.colors.deepPurple.darken4, 1,1);
   
        }
+       if(text=="Netflix"){
+       	btn.SetTextColor( "#ffffff" );
+    	btn.SetTextShadow( 7, 0, 0, MUI.colors.grey.darken4);
+    	
+    	btn.SetBackGradient(  MUI.colors.red.darken2, MUI.colors.red.lighten2, MUI.colors.red.darken1);
+ btn.SetStyle(MUI.colors.red.lighten3, MUI.colors.red.lighten1, 5, MUI.colors.red.darken4, 1,1);
+  
+       }
+        if(text=="Prime"){
+       	btn.SetTextColor( "#ffffff" );
+    	btn.SetTextShadow( 7, 0, 0, MUI.colors.blue.darken4);
+    	
+    	btn.SetBackGradient(  MUI.colors.blue.darken2, MUI.colors.blue.lighten2, MUI.colors.blue.darken1);
+ btn.SetStyle(MUI.colors.blue.lighten3, MUI.colors.blue.lighten1, 5, MUI.colors.blue.darken4, 1,1);
+  
+       }
+         if(text=="Max"){
+       	btn.SetTextColor( "#ffffff" );
+    	btn.SetTextShadow( 7, 0, 0, MUI.colors.blue.darken4);
+    	
+    	btn.SetBackGradient(  MUI.colors.blue.darken3, MUI.colors.blue.lighten1, MUI.colors.blue.darken2);
+ btn.SetStyle(MUI.colors.blue.lighten1, MUI.colors.blue, 5, MUI.colors.blue.darken4, 1,1);
+  
+       }
+        if(text=="Camera"){
+       	btn.SetTextColor( "#ffffff" );
+    	btn.SetTextShadow( 7, 0, 0, MUI.colors.indigo.darken4);
+    	
+    	btn.SetBackGradient(  MUI.colors.indigo.darken3, MUI.colors.indigo.lighten1, MUI.colors.indigo.darken2);
+ btn.SetStyle(MUI.colors.indigo.lighten1, MUI.colors.indigo, 5, MUI.colors.indigo.darken4, 1,1);
+  
+       }
+         if(text=="YouTube"){
+       	btn.SetTextColor( MUI.colors.red.darken1 );
+    	btn.SetTextShadow( 7, 0, 0, "#343434");
+    	
+    	btn.SetBackGradient(  "#efefef", "#ffffff", "#fcfcfc");
+ btn.SetStyle("#efefef", "#ffffff", 5, MUI.colors.red.darken1, 1,1);
+  
+       }
     //self = this;
     btn.data["command"]=command;
 		//self.command = command;
-    btn.SetOnTouch(function() {  self = this; self.Animate("RubberBand", null, 350); SendCommand(self.data["command"]) });
+    btn.SetOnTouch(function() {  self = this; self.Animate(GetRandomAnim(), null, 650); if(parseInt(self.data["command"])>0) {ChangeToApp(self.data["command"]); }else{ SendCommand(self.data["command"]); }});
 if(btn.data["command"]=="") eval("btn.Gone();");
 		grid.AddChild( btn );
     //lay.AddChild(btn);
@@ -176,7 +234,7 @@ function StartListening() {
 // Callback function for speech recognition
 
 function OnSpeechResult(result) {
-
+app.ShowPopup( JSON.stringify(result) )
     HandleCommand(result[0].toLowerCase());
 
 }
@@ -257,8 +315,25 @@ function HandleCommand(command) {
 } else if (command.includes("camera")) {
 
         ChangeToApp("660807");
+} else if (command.includes("spotify")) {
 
+        ChangeToApp("22297");
+        } else if (command.includes("hulu")) {
+
+        ChangeToApp("2285");
+ } else if (command.includes("max")) {
+
+        ChangeToApp("61322");
+} else if (command.includes("hbo")) {
+
+        ChangeToApp("61322");
     
+    } else if (command.includes("peacock")) {
+
+        ChangeToApp("593099");
+    } else if (command.includes("random")) {
+
+        ChangeToApp(utils.RandomIntegerRange(1, 999999).toString());
     
     } else {
 
@@ -278,31 +353,56 @@ function SendCommand(command) {
     xhr.open("POST", baseUrl + command, true);
     xhr.send();
     xhr.onload = function() {
-        if (xhr.status == 200)
-            app.ShowPopup("The [" +command +"] command was executed successfully.");
-        else
-            app.ShowPopup("Failed to execute command. " + command);
+        if (xhr.status == 200){
+            //app.ShowPopup("The [" +command +"] command was executed successfully.");
+        }else{
+            //app.ShowPopup("Failed to execute command. " + command);
+        }
     };
 }
 
 function ChangeToApp(appID) {
-    var baseUrl = "http://[ROKU_IP]:8060/Launch/".replace("[ROKU_IP]", app.ReadFile( "ip.txt" ) );
+    var baseUrl = "http://[ROKU_IP]:8060/launch/".replace("[ROKU_IP]", app.ReadFile( "ip.txt" ) );
+    app.HttpRequest( "POST", baseUrl, appID, "privateListening=true", (error, response, status)=>{if(error) alert("Error:" + error);if(response) alert("Response:" + response);/*if(status) *//*alert("Status:" + status+"\r\n"+response);*/} )
+    /*var xhr = new XMLHttpRequest();
+    xhr.open("POST", baseUrl + appID, true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            app.ShowPopup("Private listening activated");
+        } else if (xhr.readyState === 4) {
+            app.ShowPopup("Failed to activate private listening");
+        }
+    };
+
+    // Send the request (the payload may vary based on the channel)
+    var payload = {
+        "privateListening": true
+    };
+
+    xhr.send(JSON.stringify(payload));
+    */
+}
+
+function ChangeToAppLast(appID) {
+    var baseUrl = "http://[ROKU_IP]:8060/launch/".replace("[ROKU_IP]", app.ReadFile( "ip.txt" ) );
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", baseUrl + command, true);
+    xhr.open("POST", baseUrl + appID, true);
     xhr.send();
     xhr.onload = function() {
         if (xhr.status == 200)
             app.ShowPopup("The [" +appID+"] command was executed successfully.");
         else
-            app.ShowPopup("Failed to execute command. " + command);
+            app.ShowPopup("Failed to execute command. " + appID);
     };
 }
 
 function GetRandomAnim()
 {
 	gra = animations[utils.RandomIntegerRange(0, animLength)];
+	//alert(gra);
 //	app.ShowPopup( "Animation: "+gra + tvar);
-	if(gra.includes("out") || gra.includes("Out") || gra.includes("Slide")) {
+	if(gra.includes("out") || gra.includes("Out") || gra.includes("Exit") || gra.includes("To")) {
 		return GetRandomAnim();
 	} else {
 		return gra;
