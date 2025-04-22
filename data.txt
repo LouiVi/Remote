@@ -1,0 +1,226 @@
+tvinput.dtv
+tvinput.hdmi1
+tvinput.hdmi2
+tvinput.hdmi3
+tvinput.cvbs
+660807
+837
+12
+13
+
+615685
+41468
+22297
+291097
+28
+291619
+2213
+2285
+61322 max
+
+
+
+593099
+151908
+606242
+13842
+45437
+45706
+2099
+150902
+13535
+230046
+88268
+20445
+271873
+74519
+111255
+96065
+278972
+110223
+35059
+75151
+68669
+637097
+95307
+17112
+154157
+2251
+65978
+43465
+619667
+260058
+630308
+2016
+46041
+1453
+656435
+593290
+32614
+261472
+637193
+636527
+14
+96041
+2595
+75619
+298229
+23048
+75617
+23333
+97955
+196460
+623184
+253232
+172665
+48630
+143088
+283162
+715493
+86308
+73347
+553278
+44856
+195316
+620906
+292538
+630463
+649523
+68020
+573804
+584171
+773622
+552828
+633020
+73249
+62162
+278623
+259656
+93580
+737968
+681185
+592369
+44191
+651775
+731303
+731302
+58621
+586553
+669356
+687485
+624064
+649029
+774445
+787018
+
+
+Live TV
+HDMI 1
+HDMI 2
+HDMI 3 (ARC)
+AV
+Roku Cameras
+YouTube
+Netflix
+Prime Video
+Freevee
+Tubi - Free Movies & TV
+Spotify Music
+Disney Plus
+Pandora
+LaMusica
+Roku Media Player
+Hulu
+Max
+Peacock TV
+The Roku Channel
+Kids & Family on The Roku Channel
+Fandango at Home
+FilmRise
+Roku TV Intro
+Video Poker
+Mirror for Roku - Screen Mirroring
+Plex - Free Movies & TV
+Les Feldick Through the Bible
+FilmRise Español
+Vevo: Music Videos and Live Channels
+Bon Appétit
+Pluto TV - Free Movies/Shows
+The CW
+Xumo Play
+Generous 777 Slots
+Casino Channel
+HISTORY
+USA Network
+NBC
+Roku Photo Streams
+FOX Sports
+CBS Sports Stream & Watch Live
+Watch TNT
+CNET
+CNN
+Fubo: Watch Live TV & Sports
+CBS
+Castie for Roku
+Video Poker Deluxe
+Crackle
+Sling TV - Live Sports, News, Shows + Freestream
+TuneIn
+Chicken Soup for the Soul
+discovery+ | Stream TV Shows
+HappyKids - Kids TV Shows and Movies
+MGM+
+Apple Music
+AMC+
+MLB
+Discovery GO
+Crunchyroll
+HGTV GO
+Frndly TV
+Spectrum TV
+Food Network GO
+PBS KIDS
+Local Now
+Philo
+YES Network
+Dropout
+Haystack Local & World News
+Fawesome - Free Movies and TV Shows
+BritBox
+Freebie TV Free Movies & TV
+FreeMovie Browser Like Chrome
+E!
+Action Movies & TV by Fawesome
+CCX Media
+NFL
+YouTube TV
+Live TV on The Roku Channel
+SlotsTV
+Flame Slots
+Crazino TV Video Slots
+Lifetime Movie Club
+Univision
+Canela.TV
+Backdrops
+ViX: TV, Deportes y Noticias
+TVCast
+NBA
+FilmRise True Crime
+Rumble
+Web Video Caster - Receiver
+iWebTV Player
+Ibo Player Pro
+Volley - Jeopardy! & Wheel of Fortune
+Jellyfin
+Emby
+Castify
+CineToolkit Receiver
+Castly Receiver
+TV Cast (Official)
+Spy Ninjas by Chad & Vy
+Prism Pro
+XCast Receiver
+Nebula
+Peivo Media
+Search Videos with Google
+Search for Google web browser
