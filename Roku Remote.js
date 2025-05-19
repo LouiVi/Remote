@@ -1,44 +1,76 @@
+// Initialize the app and start listening
 cfg.Light, cfg.MUI, cfg.Portrait;
 app.DisableKeys( 'VOLUME_DOWN,VOLUME_UP' );
-app.LoadPlugin( "Support" );
-app.LoadPlugin( "LabelView" );
+
 app.LoadPlugin( "Utils" );
+app.LoadPlugin( "Support" );
 var found = false;
-var animations = app.CreateSupport().AnimationManager().keys;
+var animations = ["NewsPaper","Jelly","Flash","RubberBand","ShakeHorizontal","ShakeVertical","Swing","TaDa","Bounce","BounceLeft","BounceTop","BounceRight","BounceBottom","Fadein","FadeOut","Fall","FallRotate","FlipFromVerticalSwing","FlipFromHorizontal","FlipFromBottom","FlipFromVertical","FlipFromHorizontalSwing","FlipFromTop","FlipFromRight","FlipFromLeft","FlipToHorizontal","FlipToVertical","SlideFromLeft","SlideFromTop","SlideFromRight","SlideFromBottom","SlideToLeft","SlideToTop","SlideToRight","SlideToBottom","ZoominEnter","ZoominExit","ZoominLeft","ZoominTop","ZoominRight","ZoominBottom","ZoomOutExit","ZoomOutLeft","ZoomOutTop","ZoomOutRight","ZoomOutBottom"];
+//app.CreateSupport().AnimationManager().keys;
 var animLength = animations.length;
 
-const OnStart = function() {
 
-	app.SetOnKey( OnKey );
-	app.ExtractAssets( app.GetAppPath()+"ip.txt", "ip.txt", true );
-  app.SetTitle("Roku Remote");
-  lay = app.CreateLayout("linear", "Vertical, VCenter");
-  sup = app.CreateSupport();
-  utils = app.CreateUtils("LuilloSoft Inc.");
+function headerfooterAnim(){
+rColorTemp= utils.RandomHexColor(false);
+utils.SetTheme(rColorTemp);
+setTimeout("headerfooterAnim", 4500);
+}
+
+function OnStart() {
+app.SetOnKey( OnKey );
+//app.ExtractAssets( app.GetAppPath()+"ip.txt", "ip.txt", true );
+    app.SetTitle("Roku Remote");
+
+ 
+
+    // Create a layout with vertical orientation
+
+     lay = app.CreateLayout("linear", "Vertical, VCenter");
+
+sup = app.CreateSupport();
+ 
+ /*var animations = app.CreateSupport().AnimationManager().keys;
+var animLength = animations.length;*/
+utils = app.CreateUtils("LuilloSoft Inc.");
+	
 	rColor = utils.RandomHexColor(false);
-	app.SetStatusBarColor(  rColor)
-	rColor = utils.RandomHexColor(false);
-	app.SetNavBarColor( rColor )
-	//utils.SetTheme(rColor);
-	rColor = utils.RandomHexColor(false);
- CreateActionBar();
- CreateMenuBar(rColor);
+	app.WriteFile( "log.txt", rColor+"\n", "Append" )
+	//app.SetStatusBarColor(  rColor)
+	//app.SetNavBarColor( rColor )
+	utils.SetTheme(rColor);
+CreateActionBar();
+CreateMenuBar(rColor)
  grid = sup.CreateGridLayout();
- grid.SetColCount( 4 );
+ grid.SetColCount( 4);
  lay.AddChild( grid );
- web = app.CreateWebView( 1,-1 );
- web.SetBackColor( MUI.colors.deepPurple);
- lay.AddChild( web );
- FetchChannelApps(web);
-  db = app.OpenDatabase( "/storage/emulated/0/Download/a/Remote.sqlite" );
-  db.ExecuteSql( "CREATE TABLE IF NOT EXISTS remoteButtons " +  
-        "(id integer primary key AUTOINCREMENT, layout text not null, caption text not null, command text not null);" );
-DisplayAllRows();
+ web = app.CreateWebView( 1,-1 )
+ web.SetBackColor( MUI.colors.deepPurple )
+ //web.LoadHtml( app.ReadFile("marquee.html") );
+ lay.AddChild( web )
+ // Fetch the list of installed apps and display them in the WebView
+    FetchChannelApps(web);
+    
+ 
+
+    db = app.OpenDatabase( "/storage/emulated/0/Download/rr/buttons.sqlite" );
+   // app.GetPermission(  )
+    //alert(db.GetName());
+        //Create a table (if it does not exist already).  
+    //db.ExecuteSql( "Drop table remoteButtons;");
+    sql = "CREATE TABLE IF NOT EXISTS remoteBtns1(id integer primary key AUTOINCREMENT not null, layout text, caption text, command text);";
+    db.ExecuteSql( sql);
+    
+
+    // Create buttons for each command
+/*CreateButton(lay, "Back", "Back");
+CreateButton(lay, "Sleep", "Sleep");
+CreateButton(lay, "Home", "Home");
+CreateButton(lay, "Power", "Power");*/
+
 CreateButton(lay, "", "");
 CreateButton(lay, "↑ Up", "Up");
 CreateButton(lay, "", "");
-CreateButton(lay, "[IP]", "");
-//CreateButton(lay, "🟠 Down ", "VolumeDown");
+CreateButton(lay, "", "");
 CreateButton(lay, "← Left", "Left");
 CreateButton(lay, "Ok", "Select");
 CreateButton(lay, "Right →", "Right");
@@ -55,27 +87,23 @@ CreateButton(lay, "Netflix", "12");
 CreateButton(lay, "YouTube", "837");
 CreateButton(lay, "", "");
 CreateButton(lay, "🟠 Down ", "VolumeDown");
-//CreateButton(lay, "🟠 Mute ", "VolumeMute");
 CreateButton(lay, "Prime", "13");
 CreateButton(lay, "Max", "61322");
 CreateButton(lay, "", "");
-//CreateButton(lay, "🟠 Down ", "VolumeDown");
 CreateButton(lay, "🟠 Mute ", "VolumeMute");
 CreateButton(lay, "Camera", "660807");
 CreateButton(lay, "Live TV", "tvinput.dtv");
 CreateButton(lay, "", "");
-
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
-
 CreateButton(lay, "", "");
 CreateButton(lay, "", "");
 CreateButton(lay, "Repeat", "InstantReplay");
 CreateButton(lay, "Rev", "Rev");
 CreateButton(lay, "Play", "Play");
 CreateButton(lay, "Fwd", "Fwd");
-    db.Close();
+    
 //db.ExecuteSql( "INSERT INTO test_table (data, data_num)" +   
   //      " VALUES (?,?)", ["test", 100], null, OnError )  
 
@@ -84,25 +112,13 @@ CreateButton(lay, "Fwd", "Fwd");
     // Add the layout to the app
 
     app.AddLayout(lay);
+    //headerfooterAnim();
     CheckIP();
+    headerfooterAnim();
+    DisplayAllRows();
+    //db.Close();
     //ChangeToApp("837");
-	Anim(lay, 1500, ["Newspaper", "Jelly", "RubberBand"]);
-}
 
-
-function Anim(obj, timer, anims)
-{
-	switch (anims.length) {
-		case 1:
-			obj.Animate(anims[0], null, timer);
-			break;
-		case 2:
-			obj.Animate(anims[0], ()=>{obj.Animate(anims[1], null, timer);}, timer);
-			break;
-		case 3:
-			obj.Animate(anims[0], ()=>{obj.Animate(anims[1], ()=>{obj.Animate(anims[2], null, timer);}, timer);}, timer);
-		  break;
-	}
 }
 
 // Function to fetch the list of installed apps and display them in the WebView
@@ -114,6 +130,49 @@ function FetchChannelApps(webView) {
     });
 }
 
+function CreateGridLayout( w, h, rc, met )
+{
+	var laym = app.CreateLayout( "Linear", met||"VCenter" );
+	laym.GetType = function() { return "GridLayout"; };
+	laym.SetSize( w, h );
+	laym.row = rc||1;
+	laym.childCount = 0;
+	laym.parents = [];
+	laym.childs = [];
+	laym.index = 0;
+	laym.Add = laym.AddChild;
+	
+	laym.rowLayout = app.CreateLayout( "Linear", "Horizontal" );
+	laym.Add( laym.rowLayout );
+	
+	laym.SetRowCount = function( cnt ) { laym.row = cnt; };
+	laym.RemoveAll = function() {
+	  //md_isdebug = app.IsDebugEnabled();
+	  //if( md_isdebug ) app.SetDebugEnabled( false );
+		for( var i in laym.parents ) {
+			var parent = laym.parents[i];
+			laym.RemoveChild( parent );
+			}
+			laym.parents = laym.childs = [];
+			laym.index = 0;
+			//if( md_isdebug ) app.SetDebugEnabled( true );
+	};
+	laym.AddChild = function( child ) { 
+	  
+		if( laym.childCount%laym.row == 0 ) { 
+			laym.rowLayout = app.CreateLayout( "Linear", "Horizontal" ); 
+			laym.Add( laym.rowLayout ); 
+		}
+		laym.childs.push( child );
+		laym.parents.push( laym.rowLayout );
+		child.index = laym.index++;
+		laym.rowLayout.AddChild( child ); 
+		laym.childCount++; 
+};
+	
+	return laym;
+}
+
 // Function to parse the list of apps from the XML response
 function ParseApps(xml) {
     apps = [];
@@ -122,14 +181,14 @@ function ParseApps(xml) {
     appNodes = xmlDoc.getElementsByTagName("app");
 
     for (i = 0; i < appNodes.length; i++) {
-        appx = {
+        appArray= {
             id: appNodes[i].getAttribute("id"),
             name: appNodes[i].textContent,
             iconUrl: "http://192.168.70.148:8060/query/icon/" + appNodes[i].getAttribute("id")
         };
-        apps.push(appx);
+        apps.push(appArray);
     }
-//alert(JSON.stringify(apps))
+    app.WriteFile( "appArray.json", utils.Stringify(apps) );
     return apps;
 }
 
@@ -140,15 +199,16 @@ function DisplayAppsInWebView(webView, apps) {
     html += "<br/><marquee behavior='scroll' direction='alternate' scrollamount='3' style='background: linear-gradient(to bottom,  #af3995 0%,#880e67 50%,#c3238e 100%);'>";
 
     for (var i = 0; i < apps.length; i++) {
-        html += `<div style='display: inline-block; margin: 10px; text-align: center;background: linear-gradient(to bottom,  #af3995 0%,#880e67 50%,#c3238e 100%);border-radius: 10px 10px 10px 10px;'>
-                    <img onClick='javascript:ChangeToApp(this.alt);' alt='${apps[i].id}' src='${apps[i].iconUrl}' style='width: 96px; height: 96px;border-radius: 10px 10px 10px 10px; box-shadow: 0 0 4px 2px #454545;' vspace='3' hspace='4'><br>
-                    <span style='text-shadow: 1px 1px 2px #2B2B2B;'><marquee behavior='alternate' direction='left' scrollamount='1' scrolldelay='0.007' style='font-size:4px; padding-top:3px;width:96px;text-shadow: 0 0 2px #454545;'>${apps[i].name}</marquee></span>
+        html += `<div style='display: inline-block; margin: 5px; text-align: center;background: linear-gradient(to bottom,  #af3995 0%,#880e67 50%,#c3238e 100%);border-radius: 10px 10px 10px 10px;'>
+                    <img onClick='javascript:ChangeToApp(this.alt);' alt='${apps[i].id}' src='${apps[i].iconUrl}' style='width: 50px; height: 50px;border-radius: 10px 10px 10px 10px; box-shadow: 0 0 4px 2px #454545;' vspace='3' hspace='4'><br>
+                    <span style='text-shadow: 1px 1px 2px #2B2B2B;'><marquee behavior='alternate' direction='left' scrollamount='1' scrolldelay='0.007' style='font-size:4px; padding-top:3px;width:52px;text-shadow: 0 0 2px #454545;'>${apps[i].name}</marquee></span>
                  </div>`;
     }
 
     html += "</marquee></body></html>";
     //alert(html)
     webView.LoadHtml(html);
+    app.WriteFile( "marquee.html", html );
 }
 
 async function OnKey(action, name, code, extra) {
@@ -166,7 +226,7 @@ async function OnKey(action, name, code, extra) {
     //txt.SetText("")  
       
     //Get all the table rows.  
-    db.ExecuteSql( "select * from remoteButtons;", [], OnResult ) 
+    db.ExecuteSql( "select * from remoteBtns1;", [], OnResult ) 
 } 
 
 //Callback to show query results in debug.  
@@ -175,28 +235,28 @@ function OnResult( results )
     var s = "";  
     var len = results.rows.length;  
     for(var i = 0; i < len; i++ )   
-    {  
-        var item = results.rows.item(i)  
+    {
+        var item = results.rows.item(i);
+        //CreateButton(eval(item.layout), item.caption,item.command);
         s += item.id + ", " + item.layout + ", " + item.caption + ", " + item.command + "\n";   
     }  
-    //alert(s);
+ //   alert(s);
     //txt.SetText( s )  
 }  
 
 // Function to create buttons
 
 function CreateButton(lay, text, command) {
-    db.ExecuteSql( "INSERT INTO remoteButtons (caption, command)" +   
-      " VALUES (?,?)", [text, command], null, ()=>{app.ShowPopup( "Error" );});
-      // if(text=="↑ Up" || text == "↓ Down" || text == "← Left" || text == "Right →" || text == "Ok"){
+var values = ['lay',text, command];
+//alert(JSON.stringify(values));
+    db.ExecuteSql( "INSERT INTO remoteBtns1(layout, caption, command)" +   
+      " VALUES (?,?,?)", values/*[values[0], values[1], values[2]]*/, null, ()=>{alert( "Error" );});
+     // if(text=="↑ Up" || text == "↓ Down" || text == "← Left" || text == "Right →" || text == "Ok"){
      if(text=="🟠 Up   " || text == "🟠 Down " || text == "🟠 Mute "){
-  
-      btn = app.CreateButton(text, 0.25, 0.075,"AutoShrink");
-     } else if(text == "[IP]"){
-       btn = app.CreateText( "Device IP: \n"+app.ReadFile( "ip.txt" ), -1, -1, "MultiLine");
-    
+      btn = app.CreateButton(text, 0.20, 0.065,"AutoShrink");
+      //btn.SetOnTouch( btn_OnTouch )
  }else{
-    btn = app.CreateButton(text, 0.25, 0.075,"AutoShrink");
+    btn = app.CreateButton(text, 0.20, 0.075,"AutoShrink");
     }
     btn.SetFontFile( "Misc/ArchitectsDaughter-Regular.ttf" );
     btn.SetTextSize( 12 );
@@ -207,13 +267,38 @@ function CreateButton(lay, text, command) {
     	btn.SetBackGradient(  MUI.colors.gray.darken2, MUI.colors.gray.lighten2, MUI.colors.gray.darken1);
  btn.SetStyle(MUI.colors.gray.lighten3, MUI.colors.gray.lighten1, 5, MUI.colors.gray.darken4, 1,1);
        }
-       if(text=="↑ Up" || text == "↓ Down" || text == "← Left" || text == "Right →" || text == "Ok"){
+        if(text=="↑ Up"){
+       btn = app.CreateImage(  "Img/top.png", -1, -1, "Button")
+
+       }else{
+        if(text=="↓ Down" ){
+       btn = app.CreateImage(  "Img/bottom.png", -1, -1, "Button")
+
+       }else{
+         if(text=="← Left" ){
+       btn = app.CreateImage(  "Img/left.png", -1, -1, "Button")
+
+       }else{
+        if(text=="Right →"  ){
+       btn = app.CreateImage(  "Img/right.png", -1, -1, "Button,HCenter,VCenter")
+
+       }else{
+       
+       if( text == "Ok"){
+       btn.SetSize( 0.165, 0.1095 );
+       btn.SetMargins( 0.01, 0.01, 0.01, 0.01 )
+       btn.SetPadding( 0.2, 0.7)
+       //btn.set
+       //btn.SetPosition(  )
        	btn.SetTextColor( "#ffffff" );
     	btn.SetTextShadow( 7, 0, 0, MUI.colors.deepPurple.darken4);
     	
-    	btn.SetBackGradient(  MUI.colors.deepPurple.darken2, MUI.colors.deepPurple.lighten2, MUI.colors.deepPurple.darken1);
- btn.SetStyle(MUI.colors.deepPurple.lighten3, MUI.colors.deepPurple.lighten1, 5, MUI.colors.deepPurple.darken4, 1,1);
-  
+    	//btn.SetBackGradient(  MUI.colors.deepPurple.lighten4, MUI.colors.deepPurple.lighten2, MUI.colors.deepPurple.darken1);
+ btn.SetStyle(MUI.colors.purple.lighten2, MUI.colors.purple.darken1,45, MUI.colors.purple.lighten4 ,1,0.375);
+  }
+       }
+       }
+       }
        }
        if(text=="Netflix"){
        	btn.SetTextColor( "#ffffff" );
@@ -266,9 +351,11 @@ function CreateButton(lay, text, command) {
     //self = this;
     btn.data["command"]=command;
 		//self.command = command;
-    btn.SetOnTouch(function() {  self = this; self.Animate(GetRandomAnim(), null, 650); if(parseInt(self.data["command"])>0) {ChangeToApp(self.data["command"]); }else if(self.data["command"]==="Dev"){RunDev();}else{ SendCommand(self.data["command"]); }});
+    btn.SetOnTouch(function() {  self = this; self.Animate(GetRandomAnim(), null, 650); if(parseInt(self.data["command"])>0) {ChangeToApp(self.data["command"]); }else{ SendCommand(self.data["command"]); }});
+btn.Hide();
 if(btn.data["command"]=="") eval("btn.Gone();");
 		grid.AddChild( btn );
+		if(btn.data["command"]!="") btn.Animate( "Rubberband", null, 3000 );
     //lay.AddChild(btn);
 
 }
@@ -352,21 +439,7 @@ function HandleCommand(command) {
     } else if (command.includes("power")) {
 
         SendCommand("Power");
-      } else if (command.includes("dev")) {
-//alert("hello")
-        SendCommand("Home");
-        SendCommand("Home");
-        SendCommand("Home");
-        SendCommand("Up");
-        SendCommand("Up");
-        SendCommand("Right");
-        SendCommand("Left");
-        SendCommand("Right");
-        SendCommand("Left");
-        SendCommand("Right");
-      app.ShowPopup( "Developer Menu" );
-     
-             } else if (command.includes("home")) {
+         } else if (command.includes("home")) {
 
         SendCommand("Home");
 /*660807
@@ -420,33 +493,7 @@ function HandleCommand(command) {
 
 }
 
- async function RunDev()
-{
-	SendCommand("Home");
-	await sleep(850);
-        SendCommand("Home");
-        await sleep(850);
-        SendCommand("Home");
-        await sleep(850);
-        SendCommand("Up");
-        await sleep(850);
-        SendCommand("Up");
-        await sleep(850);
-        SendCommand("Right");
-        await sleep(850);
-        SendCommand("Left");
-        await sleep(850);
-        SendCommand("Right");
-        await sleep(850);
-        SendCommand("Left");
-        await sleep(850);
-        SendCommand("Right");
-      app.ShowPopup( "Developer Menu" );
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+ 
 
 // Function to send a command via HTTP to Roku
 
@@ -465,9 +512,8 @@ function SendCommand(command) {
 }
 
 function ChangeToApp(appID) {
-//alert("here");
     var baseUrl = "http://[ROKU_IP]:8060/launch/".replace("[ROKU_IP]", app.ReadFile( "ip.txt" ) );
-    app.HttpRequest( "POST", baseUrl, appID, "privateListening=true", (error, response, status)=>{if(error) alert("Error:" + error);if(response) alert("Response:" + response);/*if(status) *//*alert("Status:" + status+"\r\n"+response);*/} )
+    app.HttpRequest( "POST", baseUrl, appID, "privateListening=true|private_Listening=true", (error, response, status)=>{if(error) alert("Error:" + error);if(response) alert("Response:" + response);/*if(status) *//*alert("Status:" + status+"\r\n"+response);*/} )
     /*var xhr = new XMLHttpRequest();
     xhr.open("POST", baseUrl + appID, true);
     xhr.setRequestHeader("Content-Type", "application/json");
@@ -614,7 +660,7 @@ async function CheckIP()
 		contents = app.ReadFile( "roku-remote.txt" ).split(",");
 	//	txt.SetText(  contents[0] );
  //   txt2.SetText(  contents[1] );
-    	if(utils.Confirm('We already have saved a Roku Device called: \r\n\r\nonn. 65” Class 4K UHD (2160P) LED Roku Smart Television HDR'+/*contents[1].replace("32","65")+*/" connected to the same AP with the following IP: \r\n\r\n"+contents[0]+". \r\n\r\nIf this IP is not the same as the Roku device you want to control, do you want to search for a new one?")) app.DeleteFile( "roku-remote.txt" ), CheckIP();
+    	if(utils.Confirm("We already have saved a Roku Device called: "+contents[1]+" with IP: "+contents[0]+". You want to search for a new one?")) app.DeleteFile( "roku-remote.txt" ), CheckIP();
   }else{
 	await GetRokuTVIP();
 	}
@@ -626,7 +672,7 @@ async function GetRokuTVIP() {
     parts = ip.split(".");
     size = parts.length;
     fromNum = parseInt(parts[size - 1]);
-    toNum = 155;
+    toNum = 164;
 
     for (c = toNum; c > fromNum; c--) {
         if (found) {
